@@ -1,8 +1,13 @@
 package me.sv.route.view.binding
 
+import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.databinding.BindingAdapter
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.model.LatLng
+import kotlinx.android.synthetic.main.activity_maps.*
 import me.sv.route.R
 import me.sv.route.utils.METERS_IN_KM
 import java.util.concurrent.TimeUnit
@@ -35,4 +40,20 @@ fun setPoint(textView: TextView, point : LatLng?){
    } else {
        textView.text = textView.context.getString(R.string.tap_on_map_to_select_point)
    }
+}
+
+@BindingAdapter("bottomSheetState")
+fun setState(v: View, bottomSheetBehaviorState: Int) {
+    val viewBottomSheetBehavior = BottomSheetBehavior.from(v)
+    viewBottomSheetBehavior.state = bottomSheetBehaviorState
+}
+
+@BindingAdapter("app:setArrow")
+fun setArrow(imageView: AppCompatImageView, state : Int){
+    when (state) {
+        BottomSheetBehavior.STATE_EXPANDED -> {
+            imageView.setImageResource(R.drawable.ic_arrow_drop_down)
+        }
+        else -> imageView.setImageResource(R.drawable.ic_arrow_drop_up)
+    }
 }

@@ -1,6 +1,7 @@
 package me.sv.route.view
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -16,6 +17,9 @@ import me.sv.route.R
 import me.sv.route.databinding.ActivityMapsBinding
 import me.sv.route.viewmodel.MapsActivityViewModel
 import com.google.android.gms.maps.model.LatLng as LatLngFromServices
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import kotlinx.android.synthetic.main.activity_maps.*
 
 
 /**
@@ -37,8 +41,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        initBottomSheet()
+    }
 
-        //TODO: check Google services available
+    private fun initBottomSheet() {
+        val behavior = BottomSheetBehavior.from(ns_bottom_scroll)
+        behavior.setBottomSheetCallback(object : BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                viewModel?.bottomSheetState?.set(newState)
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            }
+        })
     }
 
     /**
@@ -56,20 +71,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             viewModel?.onPointClick(LatLng(it.latitude, it.longitude)) //pass new point to viewmodel
-            mMap.addMarker(MarkerOptions().position(it))
-
         }
 
-
+        /* observe route and markers from viewmodel and update it*/
         viewModel?.getRouteLiveData()?.observe(this, Observer<List<LatLng>> {
             drawRoute(it)
+        })
+
+        viewModel?.aPoint?.observe(this, Observer { it ->
+            it?.let {
+                mMap.addMarker(MarkerOptions().position(LatLngFromServices(it.lat, it.lng)))
+            }
+        })
+
+        viewModel?.bPoint?.observe(this, Observer { it ->
+            it?.let {
+                mMap.addMarker(MarkerOptions().position(LatLngFromServices(it.lat, it.lng)))
+            }
         })
     }
 
     private fun moveToStartPosition() {
         if (viewModel?.moveToStartPosition == true) {
-            val bratislava = LatLngFromServices(48.14816, 17.10674)
-            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(bratislava, 12f)
+            val kyiv = LatLngFromServices(50.45466, 30.5238)
+            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(kyiv, 12f)
             mMap.animateCamera(cameraUpdate)
             viewModel?.moveToStartPosition = false
         }
