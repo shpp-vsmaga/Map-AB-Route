@@ -10,6 +10,7 @@ import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
 import com.google.maps.model.LatLng
 import com.google.maps.model.TravelMode
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
@@ -72,7 +73,7 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
      * Load directions for two point using Google Directions API
      */
     private fun loadNewRoute() {
-        GlobalScope.launch(IO) {
+        GlobalScope.launch(Default) {
             // make request in IO thread to prevent lock of Main thread
             val directionsResult = async {
                 DirectionsApi.newRequest(geoApiContext)
