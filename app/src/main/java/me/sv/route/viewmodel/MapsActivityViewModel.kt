@@ -10,9 +10,11 @@ import com.google.maps.GeoApiContext
 import com.google.maps.model.DirectionsResult
 import com.google.maps.model.LatLng
 import com.google.maps.model.TravelMode
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import me.sv.route.App
 import me.sv.route.R
 import me.sv.route.utils.AVERAGE_WALKING_SPEED_METERS_IN_S
@@ -35,6 +37,7 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
     val distanceLiveData = MutableLiveData<Long>()
     val timeLiveData = MutableLiveData<Long>()
     val allPointsSelected: ObservableBoolean = ObservableBoolean(false)
+    var moveToStartPosition = true
 
     init {
         geoApiContext = GeoApiContext.Builder()
@@ -66,25 +69,45 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
      * Load directions for two point using Google Directions API
      */
     private fun loadNewRoute() {
-            val directionsResult = DirectionsApi.newRequest(geoApiContext)
-                .mode(TravelMode.WALKING)
-                .origin(aPoint.value)
-                .destination(bPoint.value)
-                .await() //TODO: load async with corutines
+            GlobalScope.launch(IO) {
+                val directionsResult = async {
+                    DirectionsApi.newRequest(geoApiContext)
+                        .mode(TravelMode.WALKING)
+                        .origin(aPoint.value)
+                        .destination(bPoint.value)
+                        .await()
+                }.await()
 
-            resetOldPoint()
+                GlobalScope.launch (Main){
+                    resetOldPoint()
 
-            directionsResult.routes?.let {
-                var newDistance = 0L
-                if (it.isNotEmpty()) {
-                    for (leg in it[0].legs) {
-                        newDistance += leg.distance.inMeters
+                    directionsResult.routes?.let {
+                        var newDistance = 0L
+                        if (it.isNotEmpty()) {
+                            for (leg in it[0].legs) {
+                                newDistance += leg.distance.inMeters
+                            }
+                            distanceLiveData.value = newDistance
+                            timeLiveData.value = getWalkingTimeForDistance(newDistance)
+                            routeLiveData.value = it[0].overviewPolyline.decodePath()
+                        }
                     }
-                    distanceLiveData.value = newDistance
-                    timeLiveData.value = getWalkingTimeForDistance(newDistance)
-                    routeLiveData.value = it[0].overviewPolyline.decodePath()
                 }
             }
+
+//            resetOldPoint()
+//
+//            directionsResult.routes?.let {
+//                var newDistance = 0L
+//                if (it.isNotEmpty()) {
+//                    for (leg in it[0].legs) {
+//                        newDistance += leg.distance.inMeters
+//                    }
+//                    distanceLiveData.value = newDistance
+//                    timeLiveData.value = getWalkingTimeForDistance(newDistance)
+//                    routeLiveData.value = it[0].overviewPolyline.decodePath()
+//                }
+//            }
     }
 
 

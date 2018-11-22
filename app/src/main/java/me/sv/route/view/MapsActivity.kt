@@ -67,9 +67,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun moveToStartPosition() {
-        val bratislava = LatLngFromServices(48.14816, 17.10674)
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(bratislava, 12f)
-        mMap.animateCamera(cameraUpdate)
+        if (viewModel?.moveToStartPosition == true) {
+            val bratislava = LatLngFromServices(48.14816, 17.10674)
+            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(bratislava, 12f)
+            mMap.animateCamera(cameraUpdate)
+            viewModel?.moveToStartPosition = false
+        }
     }
 
     /**
