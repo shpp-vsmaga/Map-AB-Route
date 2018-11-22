@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "277122629918",
+    "firebase_url": "https://ab-route.firebaseio.com",
+    "project_id": "ab-route",
+    "storage_bucket": "ab-route.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:277122629918:android:0af47e95b6ff1027",
+        "android_client_info": {
+          "package_name": "me.sv.route"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "277122629918-04n9nltrbmuqkdbkkvfdmuqtn3enr2ng.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.sv.route",
+            "certificate_hash": "d1994a841359c7fb187b8b8003f55d69a98c3ff4"
+          }
+        },
+        {
+          "client_id": "277122629918-bvmorg90sjqg5ga3lcmbcusa2vs10cc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2huh6x06Dx-c-zCtVyRdk4W-yjgxkx1Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "277122629918-bvmorg90sjqg5ga3lcmbcusa2vs10cc5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

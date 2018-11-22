@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">AB Route</string>
+    <string name="title_activity_maps">AB Route</string>
+    <string name="location_a">Location A</string>
+    <string name="location_b">Location B</string>
+    <string name="generate_route">Generate route</string>
+    <string name="distance">Distance:</string>
+    <string name="time">Time walking:</string>
+    <string name="distance_km">%.2f km</string>
+    <string name="distance_m">%d m</string>
+    <string name="time_h_m">%d h %d m</string>
+    <string name="time_m">%d m</string>
+    <string name="tap_on_map_to_select_point">Tap on map to select point</string>
+</resources>
