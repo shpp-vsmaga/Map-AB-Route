@@ -7,8 +7,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
+import com.google.maps.model.DirectionsResult
 import com.google.maps.model.LatLng
 import com.google.maps.model.TravelMode
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import me.sv.route.App
 import me.sv.route.R
 import me.sv.route.utils.AVERAGE_WALKING_SPEED_METERS_IN_S
@@ -62,26 +66,27 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
      * Load directions for two point using Google Directions API
      */
     private fun loadNewRoute() {
-        val directionsResult = DirectionsApi.newRequest(geoApiContext)
-            .mode(TravelMode.WALKING)
-            .origin(aPoint.value)
-            .destination(bPoint.value)
-            .await()
+            val directionsResult = DirectionsApi.newRequest(geoApiContext)
+                .mode(TravelMode.WALKING)
+                .origin(aPoint.value)
+                .destination(bPoint.value)
+                .await() //TODO: load async with corutines
 
-        resetOldPoint()
+            resetOldPoint()
 
-        directionsResult.routes?.let {
-            var newDistance = 0L
-            if (it.isNotEmpty()) {
-                for (leg in it[0].legs) {
-                    newDistance += leg.distance.inMeters
+            directionsResult.routes?.let {
+                var newDistance = 0L
+                if (it.isNotEmpty()) {
+                    for (leg in it[0].legs) {
+                        newDistance += leg.distance.inMeters
+                    }
+                    distanceLiveData.value = newDistance
+                    timeLiveData.value = getWalkingTimeForDistance(newDistance)
+                    routeLiveData.value = it[0].overviewPolyline.decodePath()
                 }
-                distanceLiveData.value = newDistance
-                timeLiveData.value = getWalkingTimeForDistance(newDistance)
-                routeLiveData.value = it[0].overviewPolyline.decodePath()
             }
-        }
     }
+
 
     private fun resetOldPoint() {
         oldAPoint = aPoint.value?.copy()

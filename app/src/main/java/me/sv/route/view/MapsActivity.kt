@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -15,6 +16,7 @@ import me.sv.route.R
 import me.sv.route.databinding.ActivityMapsBinding
 import me.sv.route.viewmodel.MapsActivityViewModel
 import com.google.android.gms.maps.model.LatLng as LatLngFromServices
+
 
 /**
  * Main and single activity for app
@@ -35,6 +37,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        //TODO: check Google services available
     }
 
     /**
@@ -43,6 +47,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        moveToStartPosition()
         mMap.setOnMapClickListener {
 
             /*reset map when new route creation started*/
@@ -59,6 +64,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         viewModel?.getRouteLiveData()?.observe(this, Observer<List<LatLng>> {
             drawRoute(it)
         })
+    }
+
+    private fun moveToStartPosition() {
+        val bratislava = LatLngFromServices(48.14816, 17.10674)
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(bratislava, 12f)
+        mMap.animateCamera(cameraUpdate)
     }
 
     /**
