@@ -1,7 +1,6 @@
 package me.sv.route.viewmodel
 
 import android.app.Application
-import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -16,7 +15,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import me.sv.route.App
 import me.sv.route.R
 import me.sv.route.utils.AVERAGE_WALKING_SPEED_METERS_IN_S
 import me.sv.route.utils.copy
@@ -30,21 +28,24 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
     var aPoint: MutableLiveData<LatLng?> = MutableLiveData()
     var bPoint: MutableLiveData<LatLng?> = MutableLiveData()
 
-    private val apiKey = getApplication<App>().resources.getString(R.string.google_maps_key)
+    private val apiKey = getApplication<Application>().resources.getString(R.string.google_maps_key)
     private var geoApiContext: GeoApiContext? = null
 
     private val routeLiveData: MutableLiveData<List<LatLng>> = MutableLiveData()
 
     val distanceLiveData = MutableLiveData<Long>()
     val timeLiveData = MutableLiveData<Long>()
-    val allPointsSelected: ObservableBoolean = ObservableBoolean(false)
+    val allPointsSelected: MutableLiveData<Boolean> = MutableLiveData()
     var moveToStartPosition = true
-    val bottomSheetState = ObservableInt(BottomSheetBehavior.STATE_HIDDEN)
+    val bottomSheetState : MutableLiveData<Int> = MutableLiveData()
 
     init {
         geoApiContext = GeoApiContext.Builder()
             .apiKey(apiKey)
             .build()
+
+        allPointsSelected.value = false
+        bottomSheetState.value = BottomSheetBehavior.STATE_HIDDEN
     }
 
     fun getRouteLiveData(): LiveData<List<LatLng>> = routeLiveData
@@ -70,32 +71,34 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
     /**
      * Load directions for two point using Google Directions API
      */
-    private fun loadNewRoute(){
-            GlobalScope.launch(IO) { // make request in IO thread to prevent lock of Main thread
-                val directionsResult = async {
-                    DirectionsApi.newRequest(geoApiContext)
-                        .mode(TravelMode.WALKING)
-                        .origin(aPoint.value)
-                        .destination(bPoint.value)
-                        .await()
-                }.await()
+    private fun loadNewRoute() {
+        GlobalScope.launch(IO) {
+            // make request in IO thread to prevent lock of Main thread
+            val directionsResult = async {
+                DirectionsApi.newRequest(geoApiContext)
+                    .mode(TravelMode.WALKING)
+                    .origin(aPoint.value)
+                    .destination(bPoint.value)
+                    .await()
+            }.await()
 
-                GlobalScope.launch (Main){ // update UI in main thread
-                    resetOldPoint()
+            GlobalScope.launch(Main) {
+                // update UI in main thread
+                resetOldPoint()
 
-                    directionsResult.routes?.let {
-                        var newDistance = 0L
-                        if (it.isNotEmpty()) {
-                            for (leg in it[0].legs) {
-                                newDistance += leg.distance.inMeters
-                            }
-                            distanceLiveData.value = newDistance
-                            timeLiveData.value = getWalkingTimeForDistance(newDistance)
-                            routeLiveData.value = it[0].overviewPolyline.decodePath()
+                directionsResult.routes?.let {
+                    var newDistance = 0L
+                    if (it.isNotEmpty()) {
+                        for (leg in it[0].legs) {
+                            newDistance += leg.distance.inMeters
                         }
+                        distanceLiveData.value = newDistance
+                        timeLiveData.value = getWalkingTimeForDistance(newDistance)
+                        routeLiveData.value = it[0].overviewPolyline.decodePath()
                     }
                 }
             }
+        }
     }
 
 
@@ -119,16 +122,21 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
      */
     fun onPointClick(point: LatLng) {
 
-        if (aPoint.value == null) {
-            aPoint.value = point
-            allPointsSelected.set(false)
-        } else if (aPoint.value != null && bPoint.value == null) {
-            bPoint.value = point
-            allPointsSelected.set(true)
-        } else if (aPoint.value != null && bPoint.value != null) {
-            aPoint.value = point
-            bPoint.value = null
-            allPointsSelected.set(false)
+        when {
+            (aPoint.value == null) -> {
+                aPoint.value = point
+                allPointsSelected.value = false
+            }
+            (aPoint.value != null && bPoint.value == null) -> {
+                bPoint.value = point
+                allPointsSelected.value = true
+            }
+            (aPoint.value != null && bPoint.value != null) -> {
+                aPoint.value = point
+                bPoint.value = null
+                allPointsSelected.value = false
+            }
+
         }
 
         resetCounters()
@@ -138,7 +146,7 @@ class MapsActivityViewModel(application: Application) : AndroidViewModel(applica
      * Resets Distance and Time counters in UI
      * when started new route creation
      */
-    private fun resetCounters(){
+    private fun resetCounters() {
         timeLiveData.value = 0
         distanceLiveData.value = 0
     }

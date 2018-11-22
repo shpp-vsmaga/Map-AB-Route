@@ -7,4 +7,8 @@
     <dimen name="bottom_sheet_side_padding">2dp</dimen>
     <dimen name="bottom_sheet_corner_radius">4dp</dimen>
     <dimen name="bottom_sheet_elevation">8dp</dimen>
+    <dimen name="scroll_container_margin">4dp</dimen>
+    <dimen name="card_peek_height">32dp</dimen>
+    <dimen name="card_content_padding">4dp</dimen>
+    <dimen name="margin_side">16dp</dimen>
 </resources>

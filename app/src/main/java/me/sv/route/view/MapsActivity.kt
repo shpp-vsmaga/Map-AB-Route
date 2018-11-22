@@ -3,6 +3,7 @@ package me.sv.route.view
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -29,7 +30,7 @@ import kotlinx.android.synthetic.main.activity_maps.*
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private var viewModel: MapsActivityViewModel? = null
+    private lateinit var viewModel: MapsActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +49,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val behavior = BottomSheetBehavior.from(ns_bottom_scroll)
         behavior.setBottomSheetCallback(object : BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                viewModel?.bottomSheetState?.set(newState)
+                viewModel.bottomSheetState.value = newState
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -66,25 +67,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setOnMapClickListener {
 
             /*reset map when new route creation started*/
-            if (viewModel?.allPointsSelected?.get() == true) {
+            if (viewModel.allPointsSelected.value == true) {
                 mMap.clear()
             }
 
-            viewModel?.onPointClick(LatLng(it.latitude, it.longitude)) //pass new point to viewmodel
+            viewModel.onPointClick(LatLng(it.latitude, it.longitude)) //pass new point to viewmodel
         }
 
         /* observe route and markers from viewmodel and update it*/
-        viewModel?.getRouteLiveData()?.observe(this, Observer<List<LatLng>> {
+        viewModel.getRouteLiveData().observe(this, Observer<List<LatLng>> {
             drawRoute(it)
         })
 
-        viewModel?.aPoint?.observe(this, Observer { it ->
+        viewModel.aPoint.observe(this, Observer { it ->
             it?.let {
                 mMap.addMarker(MarkerOptions().position(LatLngFromServices(it.lat, it.lng)))
             }
         })
 
-        viewModel?.bPoint?.observe(this, Observer { it ->
+        viewModel.bPoint.observe(this, Observer { it ->
             it?.let {
                 mMap.addMarker(MarkerOptions().position(LatLngFromServices(it.lat, it.lng)))
             }
@@ -92,11 +93,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun moveToStartPosition() {
-        if (viewModel?.moveToStartPosition == true) {
+        if (viewModel.moveToStartPosition) {
             val kyiv = LatLngFromServices(50.45466, 30.5238)
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(kyiv, 12f)
             mMap.animateCamera(cameraUpdate)
-            viewModel?.moveToStartPosition = false
+            viewModel.moveToStartPosition = false
         }
     }
 
@@ -110,7 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             line.add(LatLngFromServices(point.lat, point.lng))
         }
 
-        line.width(18f).color(resources.getColor(R.color.color_route_line))
+        line.width(18f).color(ContextCompat.getColor(this, R.color.color_route_line))
         mMap.addPolyline(line)
     }
 }

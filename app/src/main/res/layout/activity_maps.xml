@@ -29,9 +29,9 @@
             android:id="@+id/ns_bottom_scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_margin="@dimen/scroll_container_margin"
             app:behavior_hideable="false"
-            app:behavior_peekHeight="32dp"
+            app:behavior_peekHeight="@dimen/card_peek_height"
             app:bottomSheetState="@{viewmodel.bottomSheetState}"
             app:layout_behavior="@string/bottom_sheet_behavior">
 
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="@dimen/bottom_sheet_corner_radius"
                 app:cardElevation="@dimen/bottom_sheet_elevation"
-                app:contentPadding="4dp">
+                app:contentPadding="@dimen/card_content_padding">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/cl_bottom_container"
@@ -61,18 +61,18 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintRight_toRightOf="parent"/>
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_a_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="@dimen/margin_side"
                         android:text="@string/location_a"
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         app:layout_constraintLeft_toLeftOf="@+id/edt_a_point"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_b_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -83,11 +83,11 @@
                         app:layout_constraintLeft_toLeftOf="@+id/edt_b_point"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/edt_a_point"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="@dimen/margin_side"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/tap_to_selects_bg"
                         android:ellipsize="end"
@@ -100,12 +100,12 @@
                         app:layout_constraintTop_toBottomOf="@+id/tv_a_label"
                         app:setPoint="@{viewmodel.APoint}" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/edt_b_point"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginStart="@dimen/margin_side"
+                        android:layout_marginEnd="@dimen/margin_side"
                         android:background="@drawable/tap_to_selects_bg"
                         android:ellipsize="end"
                         android:lines="1"
@@ -142,7 +142,7 @@
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/btn_generate_route" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_distance_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -156,7 +156,7 @@
                         app:layout_constraintLeft_toLeftOf="@+id/btn_generate_route"
                         app:layout_constraintTop_toTopOf="@+id/divider" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_distance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -167,7 +167,7 @@
                         app:layout_constraintLeft_toRightOf="@+id/tv_distance_label"
                         app:layout_constraintTop_toTopOf="@+id/tv_distance_label" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_time_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -181,7 +181,7 @@
                         app:layout_constraintRight_toLeftOf="@+id/tv_time"
                         app:layout_constraintTop_toTopOf="@+id/tv_distance_label" />
 
-                    <TextView
+                    <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
